@@ -28,4 +28,5 @@ def send(msg):
     client.send(message)
 
 
-send("hello")
+send('Ola rapaziada!')
+send(DISCONNECT_MESSAGE)

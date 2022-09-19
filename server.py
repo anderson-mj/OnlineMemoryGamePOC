@@ -5,6 +5,7 @@ Este código implementará a instância do servidor da aplicação
 
 import socket
 import threading
+import json
 
 HEADER = 64
 PORT = 5050
@@ -15,6 +16,8 @@ DISCONNECT_MESSAGE = '!DISCONNECT'
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
+
+active_connections = []
 
 
 def handle_client(conn, addr):
@@ -32,7 +35,8 @@ def handle_client(conn, addr):
 
             if msg == DISCONNECT_MESSAGE:
                 connected = False
-            print(f'[{addr}] {msg}...')
+            
+            print(f'Tipo de mensagem: {type(msg)}, {msg}')
 
     conn.close()
 
@@ -48,7 +52,10 @@ def start() -> None:
         conn, addr = server.accept()
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
-        print(f'[ACTIVE CONNECTIONS] {threading.active_count() - 1}...')
+        active_connections.append(conn)
+        print(f'[ACTIVE CONNECTIONS] {threading.active_count() - 1}...\n\n')
+
+        print(f'[CONEXÕES ATIVAS] {active_connections}\n')
 
 
 print('[STARTING] server is starting...')

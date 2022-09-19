@@ -9,14 +9,14 @@ import sys
 import time
 import random
 
-
+# CLIENTE
 def limpa_tela() -> None:
     """
     Limpa o terminal
     """
     os.system('cls' if os.name == 'nt' else 'clear')
 
-
+# CLIENTE
 def imprime_tabuleiro(tabuleiro_atual) -> None:
     """
     Imprime o tabuleiro no terminal
@@ -53,7 +53,7 @@ def imprime_tabuleiro(tabuleiro_atual) -> None:
 
         sys.stdout.write("\n")
 
-
+# SERVIDOR
 def novo_tabuleiro(dim) -> list:
     """
     Cria um novo tabuleiro para a partida
@@ -89,7 +89,7 @@ def novo_tabuleiro(dim) -> list:
 
     return tabuleiro_novo
 
-
+# SERVIDOR
 def abre_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Abre a peça escolhida pelo jogador
@@ -102,7 +102,7 @@ def abre_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
 
     return False
 
-
+# SERVIDOR
 def fecha_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Fecha a peça escolhida pelo jogador
@@ -116,7 +116,7 @@ def fecha_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
 
     return False
 
-
+# SERVIDOR
 def remove_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Remove a peça escolhida pelo jogador
@@ -128,7 +128,7 @@ def remove_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     tabuleiro_atual[pos_i][pos_j] = "-"
     return True
 
-
+# SERVIDOR
 def novo_placar(n_jogadores) -> list:
     """
     Cria um novo placar
@@ -136,7 +136,7 @@ def novo_placar(n_jogadores) -> list:
 
     return [0] * n_jogadores
 
-
+# SERVIDOR
 def incrementa_placar(placar_atual, jogador) -> None:
     """
     Incrementa o placar pra um jogador
@@ -144,7 +144,7 @@ def incrementa_placar(placar_atual, jogador) -> None:
 
     placar_atual[jogador] = placar_atual[jogador] + 1
 
-
+# SERVIDOR
 def imprime_placar(placar_atual) -> None:
     """
     Imprime o placar atual
@@ -157,7 +157,7 @@ def imprime_placar(placar_atual) -> None:
     for jogador in range(0, n_jogadores):
         print(f"Jogador {jogador + 1}: {placar_atual[jogador]}")
 
-
+# CLIENTE
 def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
     """
     Imprime o status do jogo
@@ -172,7 +172,7 @@ def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
 
     print(f"Vez do Jogador {vez + 1}.\n")
 
-
+# CLIENTE
 def le_coordenada(dim) -> any:
     """
     Le a coordenada que o jogador irá digitar
@@ -265,11 +265,13 @@ while PARES_ENCONTRADOS < TOTAL_DE_PARES:
 
         print(f"Pecas casam! Ponto para o jogador {VEZ + 1}.")
 
+
         incrementa_placar(placar, VEZ)
         PARES_ENCONTRADOS = PARES_ENCONTRADOS + 1
         remove_peca(tabuleiro, i_1, j_1)
         remove_peca(tabuleiro, i_2, j_2)
 
+        # MANDA MENSAGEM PARA O SERVIDOR
         time.sleep(5)
     else:
 
@@ -281,6 +283,7 @@ while PARES_ENCONTRADOS < TOTAL_DE_PARES:
         fecha_peca(tabuleiro, i_2, j_2)
         VEZ = (VEZ + 1) % N_JOGADORES
 
+        # MANDA MENSAGEM PARA O SERVIDOR
 pontuacao_maxima = max(placar)
 vencedores = []
 
