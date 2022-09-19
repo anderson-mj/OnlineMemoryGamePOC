@@ -1,32 +1,29 @@
-"""Servidor
+"""
+--- Cliente ---
 
 Este código implementará a instância do cliente da aplicação
 """
 
 import socket
+from utils import *
 
-HEADER = 64
-FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = '!DISCONNECT'
-SERVER = socket.gethostbyname(socket.gethostname())
-PORT = 5050
-ADDR = (SERVER, PORT)
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.connect(ADDR)
 
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(ADDR)
+"""
+Checa se todos os jogadores estão conectados
+"""
+# can_play = False
+# while not can_play:
+#     pass
 
+while True:
+    mensagem = input('Digite uma mensagem: ')
+    try:
+        send_message(mensagem, server)
+    except:
+        server.close()
+        print('Conexão encerrada')
+        break
 
-def send(msg):
-    """
-    Envia mensagens para o servidor
-    """
-    message = msg.encode(FORMAT)
-    msg_len = len(message)
-    send_len = str(msg_len).encode(FORMAT)
-    send_len += b' ' * (HEADER - len(send_len))
-    client.send(send_len)
-    client.send(message)
-
-
-send('Ola rapaziada!')
-send(DISCONNECT_MESSAGE)
+    connected = receive_message(server)

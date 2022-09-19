@@ -1,21 +1,19 @@
-"""Servidor
+"""
+--- Servidor ---
 
 Este código implementará a instância do servidor da aplicação
 """
 
 import socket
 import threading
-import json
+from utils import *
+# import json
 
-HEADER = 64
-PORT = 5050
-SERVER = socket.gethostbyname(socket.gethostname())
-ADDR = (SERVER, PORT)
-FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = '!DISCONNECT'
-
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(ADDR)
+DIM = 4
+N_JOGADORES = 2
+TOTAL_DE_PARES = DIM**2 / 2
+PARES_ENCONTRADOS = 0
+VEZ = 0
 
 active_connections = []
 
@@ -24,20 +22,13 @@ def handle_client(conn, addr):
     """
     Lida com as conexões ao servidor
     """
-    print(f'[NEW CONNECTION] {addr} connected...')
+    print(f'[NOVA CONEXÃO] {addr} conectado...')
 
     connected = True
     while connected:
-        msg_len = conn.recv(HEADER).decode(FORMAT)
-        if msg_len:
-            msg_len = int(msg_len)
-            msg = conn.recv(msg_len).decode(FORMAT)
-
-            if msg == DISCONNECT_MESSAGE:
-                connected = False
-            
-            print(f'Tipo de mensagem: {type(msg)}, {msg}')
-
+        connected = receive_message(conn)
+        send_message('Mensagem do servidor', conn)
+        
     conn.close()
 
 
@@ -55,8 +46,15 @@ def start() -> None:
         active_connections.append(conn)
         print(f'[ACTIVE CONNECTIONS] {threading.active_count() - 1}...\n\n')
 
-        print(f'[CONEXÕES ATIVAS] {active_connections}\n')
+        while not len(active_connections) == N_JOGADORES:
+            for conn in active_connections:
+                send_message('can_play: False', conn)
+        
+        send_message('can_play: True', conn)
 
+print('[LIGADO] Servidor iniciando...')
 
-print('[STARTING] server is starting...')
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(ADDR)
+
 start()
