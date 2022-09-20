@@ -4,25 +4,23 @@ Este código implementa um jogo da memória que será jogado entre dois jogadore
 através de uma conexão por sockets.
 """
 
-import os
-import sys
-import time
-import random
-from utils import *
+import sys # FOI
+import time # FOI
+from utils import * # FOI
 
-DIM = 4
+DIM = 4 # FOI
 
-N_JOGADORES = 2
+N_JOGADORES = 2 # FOI
 
-TOTAL_DE_PARES = DIM**2 / 2
+TOTAL_DE_PARES = DIM**2 / 2 # FOI
 
-PARES_ENCONTRADOS = 0
+PARES_ENCONTRADOS = 0 # FOI
 
-VEZ = 0
+VEZ = 0 # FOI
 
-tabuleiro = novo_tabuleiro(DIM)
+tabuleiro = novo_tabuleiro(DIM) # FOI
 
-placar = novo_placar(N_JOGADORES)
+placar = novo_placar(N_JOGADORES) # FOI
 
 while PARES_ENCONTRADOS < TOTAL_DE_PARES:
     while True:
@@ -84,20 +82,4 @@ while PARES_ENCONTRADOS < TOTAL_DE_PARES:
         fecha_peca(tabuleiro, i_2, j_2)
         VEZ = (VEZ + 1) % N_JOGADORES
 
-        # MANDA MENSAGEM PARA O SERVIDOR
-pontuacao_maxima = max(placar)
-vencedores = []
-
-for i in range(0, N_JOGADORES):
-    if placar[i] == pontuacao_maxima:
-        vencedores.append(i)
-
-if len(vencedores) > 1:
-    sys.stdout.write("Houve empate entre os jogadores ")
-    for i in vencedores:
-        sys.stdout.write(str(i + 1) + ' ')
-
-    sys.stdout.write("\n")
-
-else:
-    print(f"Jogador {vencedores[0] + 1} foi o vencedor!")
+    imprime_vencedor(placar, N_JOGADORES)

@@ -24,9 +24,11 @@ import os
 import sys
 import time
 import random
+from termcolor import colored
+
 HEADER = 64
 FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = '!DISCONNECT'
+MENSAGEM_DESCONECTADO = '!DISCONNECT'
 SERVER = '25.0.115.12'
 PORT = 5050
 ADDR = (SERVER, PORT)
@@ -36,30 +38,28 @@ Funções de 'Server'
 """
 
 
-def send_message(msg, conn):
+def envia_mensagem(msg, conn):
     """
     Envia mensagens para a conexão passada
     """
-    message = msg.encode(FORMAT)
-    msg_len = len(message)
-    send_len = str(msg_len).encode(FORMAT)
-    send_len += b' ' * (HEADER - len(send_len))
-    conn.send(send_len)
-    conn.send(message)
+    mensagem = msg.encode(FORMAT)
+    envio_tam = str(len(mensagem)).encode(FORMAT)
+    envio_tam += b' ' * (HEADER - len(envio_tam))
+    conn.send(envio_tam)
+    conn.send(mensagem)
 
 
-def receive_message(conn):
-    keep_alive = True
-    msg_len = conn.recv(HEADER).decode(FORMAT)
-    if msg_len:
-        msg_len = int(msg_len)
-        msg = conn.recv(msg_len).decode(FORMAT)
+def recebe_mensagem(conn):
+    KEEP_ALIVE = True
+    tam_mensagem = conn.recv(HEADER).decode(FORMAT)
+    if tam_mensagem:
+        tam_mensagem = int(tam_mensagem)
+        mensagem = conn.recv(tam_mensagem).decode(FORMAT)
 
-    if msg == DISCONNECT_MESSAGE:
-        keep_alive = False
+    if mensagem == MENSAGEM_DESCONECTADO:
+        KEEP_ALIVE = False
 
-    print(f'Mensagem recebida: {msg}')
-    return keep_alive
+    return mensagem, KEEP_ALIVE
 
 
 def send_dict(dict, conn):
@@ -142,6 +142,36 @@ def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
 
     print(f"Vez do Jogador {vez + 1}.\n")
 
+def imprime_vencedor(placar, N_JOGADORES):
+    """
+    A partir do placar define o(s) vencedor(es) e imprime na tela
+    """
+    pontuacao_maxima = max(placar)
+    vencedores = []
+
+    for i in range(0, N_JOGADORES):
+        if placar[i] == pontuacao_maxima:
+            vencedores.append(i)
+
+    if len(vencedores) > 1:
+        sys.stdout.write("Houve empate entre os jogadores ")
+        for i in vencedores:
+            sys.stdout.write(str(i + 1) + ' ')
+
+        sys.stdout.write("\n")
+
+    else:
+        print(f"Jogador {vencedores[0] + 1} foi o vencedor!")
+
+def imprime_aguardando(aguardando):
+    """
+    Indica que os jogadores ainda não estão conectados
+    """
+    if aguardando:
+        print(colored("\n\n*** Aguardando conexões... ***\n", 'red', attrs=['bold']))
+        return
+    
+    print(colored("\n*** Todos os jogadores conectados! ***", 'green', attrs=['bold']))
 
 def le_coordenada(dim) -> any:
     """
