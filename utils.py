@@ -16,16 +16,17 @@ messageClientServer = {
 Módulo de utilidades para o projeto
 """
 
+
 """
 Constantes e funções utilizadas ao longo do projeto
 """
+
 import socket
 import os
 import sys
 import time
 import random
 from termcolor import colored
-
 HEADER = 64
 FORMAT = 'utf-8'
 MENSAGEM_DESCONECTADO = '!DISCONNECT'
@@ -50,6 +51,10 @@ def envia_mensagem(msg, conn):
 
 
 def recebe_mensagem(conn):
+    """
+    Recebe mensagens da conexão passada, e indica se a conexão deve continuar ativa
+    """
+
     KEEP_ALIVE = True
     tam_mensagem = conn.recv(HEADER).decode(FORMAT)
     if tam_mensagem:
@@ -75,6 +80,7 @@ def limpa_tela() -> None:
     """
     Limpa o terminal
     """
+
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
@@ -142,10 +148,12 @@ def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
 
     print(f"Vez do Jogador {vez + 1}.\n")
 
+
 def imprime_vencedor(placar, N_JOGADORES):
     """
     A partir do placar define o(s) vencedor(es) e imprime na tela
     """
+
     pontuacao_maxima = max(placar)
     vencedores = []
 
@@ -163,15 +171,20 @@ def imprime_vencedor(placar, N_JOGADORES):
     else:
         print(f"Jogador {vencedores[0] + 1} foi o vencedor!")
 
+
 def imprime_aguardando(aguardando):
     """
     Indica que os jogadores ainda não estão conectados
     """
+
     if aguardando:
-        print(colored("\n\n*** Aguardando conexões... ***\n", 'red', attrs=['bold']))
+        print(colored("\n\n*** Aguardando conexões... ***\n",
+              'red', attrs=['bold']))
         return
-    
-    print(colored("\n*** Todos os jogadores conectados! ***", 'green', attrs=['bold']))
+
+    print(colored("\n*** Todos os jogadores conectados! ***",
+          'green', attrs=['bold']))
+
 
 def le_coordenada(dim) -> any:
     """
