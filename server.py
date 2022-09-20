@@ -57,5 +57,6 @@ def inciar() -> None:
             print(f'[LIMITE ATINGIDO] Limite de jogadores atingido...')
             break
 
+limpa_tela()
 print('[LIGADO] Servidor iniciando...\n')
 inciar()
