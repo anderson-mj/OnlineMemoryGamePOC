@@ -28,7 +28,7 @@ def handle_client(conn, addr):
     while connected:
         connected = receive_message(conn)
         send_message('Mensagem do servidor', conn)
-        
+
     conn.close()
 
 
@@ -49,8 +49,9 @@ def start() -> None:
         while not len(active_connections) == N_JOGADORES:
             for conn in active_connections:
                 send_message('can_play: False', conn)
-        
+
         send_message('can_play: True', conn)
+
 
 print('[LIGADO] Servidor iniciando...')
 

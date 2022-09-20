@@ -15,15 +15,15 @@ messageClientServer = {
 """
 Módulo de utilidades para o projeto
 """
+
+"""
+Constantes e funções utilizadas ao longo do projeto
+"""
 import socket
 import os
 import sys
 import time
 import random
-
-"""
-Constantes e funções utilizadas ao longo do projeto
-"""
 HEADER = 64
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = '!DISCONNECT'
@@ -35,6 +35,7 @@ ADDR = (SERVER, PORT)
 Funções de 'Server'
 """
 
+
 def send_message(msg, conn):
     """
     Envia mensagens para a conexão passada
@@ -45,6 +46,7 @@ def send_message(msg, conn):
     send_len += b' ' * (HEADER - len(send_len))
     conn.send(send_len)
     conn.send(message)
+
 
 def receive_message(conn):
     keep_alive = True
@@ -61,16 +63,20 @@ def receive_message(conn):
 
 
 def send_dict(dict, conn):
-  pass
+    pass
+
 
 """
 Funções de 'Front'
 """
+
+
 def limpa_tela() -> None:
     """
     Limpa o terminal
     """
     os.system('cls' if os.name == 'nt' else 'clear')
+
 
 def imprime_tabuleiro(tabuleiro_atual) -> None:
     """
@@ -108,6 +114,7 @@ def imprime_tabuleiro(tabuleiro_atual) -> None:
 
         sys.stdout.write("\n")
 
+
 def imprime_placar(placar_atual) -> None:
     """
     Imprime o placar atual
@@ -119,6 +126,7 @@ def imprime_placar(placar_atual) -> None:
     print("---------------------")
     for jogador in range(0, n_jogadores):
         print(f"Jogador {jogador + 1}: {placar_atual[jogador]}")
+
 
 def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
     """
@@ -133,6 +141,7 @@ def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
     sys.stdout.write('\n')
 
     print(f"Vez do Jogador {vez + 1}.\n")
+
 
 def le_coordenada(dim) -> any:
     """
@@ -168,9 +177,11 @@ def le_coordenada(dim) -> any:
 
     return (pos_i, pos_j)
 
+
 """
 Funções de 'Back'
 """
+
 
 def novo_tabuleiro(dim) -> list:
     """
@@ -207,6 +218,7 @@ def novo_tabuleiro(dim) -> list:
 
     return tabuleiro_novo
 
+
 def abre_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Abre a peça escolhida pelo jogador
@@ -218,6 +230,7 @@ def abre_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
         return True
 
     return False
+
 
 def fecha_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
@@ -232,6 +245,7 @@ def fecha_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
 
     return False
 
+
 def remove_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Remove a peça escolhida pelo jogador
@@ -243,12 +257,14 @@ def remove_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     tabuleiro_atual[pos_i][pos_j] = "-"
     return True
 
+
 def novo_placar(n_jogadores) -> list:
     """
     Cria um novo placar
     """
 
     return [0] * n_jogadores
+
 
 def incrementa_placar(placar_atual, jogador) -> None:
     """

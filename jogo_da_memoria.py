@@ -67,7 +67,6 @@ while PARES_ENCONTRADOS < TOTAL_DE_PARES:
 
         print(f"Pecas casam! Ponto para o jogador {VEZ + 1}.")
 
-
         incrementa_placar(placar, VEZ)
         PARES_ENCONTRADOS = PARES_ENCONTRADOS + 1
         remove_peca(tabuleiro, i_1, j_1)
