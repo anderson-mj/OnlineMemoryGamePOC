@@ -1,55 +1,66 @@
-"""Servidor
+"""
+--- Servidor ---
 
 Este código implementará a instância do servidor da aplicação
 """
 
 import socket
 import threading
-
-HEADER = 64
-PORT = 5050
-SERVER = socket.gethostbyname(socket.gethostname())
-ADDR = (SERVER, PORT)
-FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = '!DISCONNECT'
+from utils import *
+import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
+"""
+Configurações do jogo
+"""
 
-def handle_client(conn, addr):
+DIM = 4
+N_JOGADORES = 2
+TOTAL_DE_PARES = DIM**2 / 2
+PARES_ENCONTRADOS = 0
+CONEXOES_ATIVAS = []
+TABULEIRO = novo_tabuleiro(DIM)
+PLACAR = novo_placar(N_JOGADORES)
+
+
+def gerencia_cliente(conn, addr):
     """
     Lida com as conexões ao servidor
     """
-    print(f'[NEW CONNECTION] {addr} connected...')
+    KEEP_ALIVE = True
+    while KEEP_ALIVE:
+        mensagem, KEEP_ALIVE = recebe_mensagem(conn)
+        print(mensagem)
 
-    connected = True
-    while connected:
-        msg_len = conn.recv(HEADER).decode(FORMAT)
-        if msg_len:
-            msg_len = int(msg_len)
-            msg = conn.recv(msg_len).decode(FORMAT)
-
-            if msg == DISCONNECT_MESSAGE:
-                connected = False
-            print(f'[{addr}] {msg}...')
-
+    print(f'[DESCONEXÃO] {addr} desconectado...')
     conn.close()
 
 
-def start() -> None:
+def inciar() -> None:
     """
     Inicia o servidor
     """
     server.listen()
-    print(f'[LISTENING] server is listening on {SERVER}')
+    print(f'[AGUARDANDO CONEXÕES] Servidor esperando conexões em: {SERVER}\n')
 
     while True:
-        conn, addr = server.accept()
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
-        thread.start()
-        print(f'[ACTIVE CONNECTIONS] {threading.active_count() - 1}...')
+        if threading.active_count() - 1 < N_JOGADORES:
+            conn, addr = server.accept()
+            thread = threading.Thread(
+                target=gerencia_cliente, args=(conn, addr))
+            thread.start()
+            CONEXOES_ATIVAS.append(conn)
+            print(f'[NOVA CONEXÃO] {addr} conectado...')
+            envia_mensagem(str(threading.active_count() - 1), conn)
+        else:
+            for conn in CONEXOES_ATIVAS:
+                envia_mensagem('CAN_PLAY', conn)
+            print(f'[LIMITE ATINGIDO] Limite de jogadores atingido...')
+            break
 
 
-print('[STARTING] server is starting...')
-start()
+limpa_tela()
+print('[LIGADO] Servidor iniciando...\n')
+inciar()
