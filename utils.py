@@ -21,15 +21,19 @@ Módulo de utilidades para o projeto
 Constantes e funções utilizadas ao longo do projeto
 """
 
+
 import socket
 import os
 import sys
 import random
 from termcolor import colored
 
+DIM = 4
+N_JOGADORES = 2
+TOTAL_DE_PARES = DIM**2 / 2
 HEADER = 64
 FORMAT = 'utf-8'
-MENSAGEM_DESCONECTADO = '!DISCONNECT'
+MENSAGEM_DESCONECTADO = '!DISC'
 SERVER = '25.0.115.12'
 PORT = 5050
 ADDR = (SERVER, PORT)
@@ -50,7 +54,7 @@ def envia_mensagem(msg, conn):
     conn.send(mensagem)
 
 
-def recebe_mensagem(conn):
+def recebe_mensagem(conn) -> tuple[str, bool]:
     """
     Recebe mensagens da conexão passada, e indica se a conexão deve continuar ativa
     """
@@ -65,10 +69,6 @@ def recebe_mensagem(conn):
         KEEP_ALIVE = False
 
     return mensagem, KEEP_ALIVE
-
-
-def send_dict(dict, conn):
-    pass
 
 
 """
@@ -185,6 +185,7 @@ def imprime_aguardando(aguardando):
     print(colored("\n*** Todos os jogadores conectados! ***",
           'green', attrs=['bold']))
 
+
 def imprime_jogador(NUMERO_JOGADOR):
     """
     Indica que um jogador se conectou
@@ -192,6 +193,7 @@ def imprime_jogador(NUMERO_JOGADOR):
     print(f'*** Você é o jogador: ', end="")
     print(colored(f'{NUMERO_JOGADOR}', 'cyan', attrs=['bold']), end="")
     print(' ***')
+
 
 def le_coordenada(dim) -> any:
     """

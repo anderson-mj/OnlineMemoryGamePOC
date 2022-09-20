@@ -5,8 +5,9 @@ Este código implementará a instância do cliente da aplicação
 """
 
 import socket
-from utils import *
 import time
+import ast
+from utils import *
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(ADDR)
@@ -27,10 +28,9 @@ while KEEP_ALIVE:
             time.sleep(3)
     else:
         limpa_tela()
+        infos, KEEP_ALIVE = recebe_mensagem(server)
+        infos = ast.literal_eval(infos)
+        
+        imprime_status(infos['tabuleiro'], infos['placar'], infos['vez'])
+
         mensagem = input('Digite uma mensagem: ')
-        try:
-            envia_mensagem(mensagem, server)
-        except:
-            server.close()
-            print('Conexão encerrada')
-            break
