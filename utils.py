@@ -24,6 +24,7 @@ Constantes e funções utilizadas ao longo do projeto
 
 import socket
 import os
+import time
 import sys
 import random
 from termcolor import colored
@@ -50,7 +51,10 @@ def envia_mensagem(msg, conn):
     mensagem = msg.encode(FORMAT)
     envio_tam = str(len(mensagem)).encode(FORMAT)
     envio_tam += b' ' * (HEADER - len(envio_tam))
+    print(f'envio_tam: {envio_tam}')
     conn.send(envio_tam)
+    time.sleep(1)
+    print(f'mensagem: {mensagem}')
     conn.send(mensagem)
 
 
@@ -64,9 +68,6 @@ def recebe_mensagem(conn) -> tuple[str, bool]:
     if tam_mensagem:
         tam_mensagem = int(tam_mensagem)
         mensagem = conn.recv(tam_mensagem).decode(FORMAT)
-
-    if mensagem == MENSAGEM_DESCONECTADO:
-        KEEP_ALIVE = False
 
     return mensagem, KEEP_ALIVE
 

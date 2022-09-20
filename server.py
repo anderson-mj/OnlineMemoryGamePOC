@@ -8,6 +8,7 @@ import socket
 import threading
 from utils import *
 import json
+import ast
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
@@ -20,6 +21,7 @@ PARES_ENCONTRADOS = 0
 CONEXOES_ATIVAS = []
 TABULEIRO = novo_tabuleiro(DIM)
 PLACAR = novo_placar(N_JOGADORES)
+VEZ = 0
 
 
 def gerencia_cliente(conn, addr):
@@ -28,8 +30,11 @@ def gerencia_cliente(conn, addr):
     """
     KEEP_ALIVE = True
     while KEEP_ALIVE:
-        mensagem, KEEP_ALIVE = recebe_mensagem(conn)
-        print(mensagem)
+        infos, KEEP_ALIVE = recebe_mensagem(conn)
+        infos = ast.literal_eval(infos)
+        
+        for conn in CONEXOES_ATIVAS:
+            envia_mensagem(str(infos), conn)
 
     print(f'[DESCONEXÃO] {addr} desconectado...')
     conn.close()
@@ -50,7 +55,7 @@ def inciar() -> None:
             thread.start()
             CONEXOES_ATIVAS.append(conn)
             print(f'[NOVA CONEXÃO] {addr} conectado...')
-            envia_mensagem(str(threading.active_count()), conn)
+            envia_mensagem(str(threading.active_count() - 1), conn)
         else:
             for conn in CONEXOES_ATIVAS:
                 envia_mensagem('CAN_PLAY', conn)
@@ -60,7 +65,8 @@ def inciar() -> None:
     infos = {
         'tabuleiro': TABULEIRO,
         'placar': PLACAR,
-        'vez': 0
+        'vez': VEZ,
+        'pares_encontrados': PARES_ENCONTRADOS
     }
 
     for conn in CONEXOES_ATIVAS:
