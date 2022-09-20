@@ -24,9 +24,9 @@ Constantes e funções utilizadas ao longo do projeto
 import socket
 import os
 import sys
-import time
 import random
 from termcolor import colored
+
 HEADER = 64
 FORMAT = 'utf-8'
 MENSAGEM_DESCONECTADO = '!DISCONNECT'
@@ -185,6 +185,13 @@ def imprime_aguardando(aguardando):
     print(colored("\n*** Todos os jogadores conectados! ***",
           'green', attrs=['bold']))
 
+def imprime_jogador(NUMERO_JOGADOR):
+    """
+    Indica que um jogador se conectou
+    """
+    print(f'*** Você é o jogador: ', end="")
+    print(colored(f'{NUMERO_JOGADOR}', 'cyan', attrs=['bold']), end="")
+    print(' ***')
 
 def le_coordenada(dim) -> any:
     """

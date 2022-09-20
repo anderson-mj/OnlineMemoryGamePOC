@@ -15,6 +15,7 @@ server.bind(ADDR)
 """
 Configurações do jogo
 """
+
 DIM = 4
 N_JOGADORES = 2
 TOTAL_DE_PARES = DIM**2 / 2
@@ -22,6 +23,7 @@ PARES_ENCONTRADOS = 0
 CONEXOES_ATIVAS = []
 TABULEIRO = novo_tabuleiro(DIM)
 PLACAR = novo_placar(N_JOGADORES)
+
 
 def gerencia_cliente(conn, addr):
     """
@@ -46,7 +48,8 @@ def inciar() -> None:
     while True:
         if threading.active_count() - 1 < N_JOGADORES:
             conn, addr = server.accept()
-            thread = threading.Thread(target=gerencia_cliente, args=(conn, addr))
+            thread = threading.Thread(
+                target=gerencia_cliente, args=(conn, addr))
             thread.start()
             CONEXOES_ATIVAS.append(conn)
             print(f'[NOVA CONEXÃO] {addr} conectado...')
@@ -56,6 +59,7 @@ def inciar() -> None:
                 envia_mensagem('CAN_PLAY', conn)
             print(f'[LIMITE ATINGIDO] Limite de jogadores atingido...')
             break
+
 
 limpa_tela()
 print('[LIGADO] Servidor iniciando...\n')
