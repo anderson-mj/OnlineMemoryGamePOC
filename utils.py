@@ -178,21 +178,23 @@ def imprime_aguardando(aguardando):
     """
 
     if aguardando:
-        print(colored("\n\n*** Aguardando conexões... ***\n",
-              'red', attrs=['bold']))
+        print("\n\n*** Aguardando conexões... ***\n")
+        # print(colored("\n\n*** Aguardando conexões... ***\n",
+        #       'red', attrs=['bold']))
         return
 
-    print(colored("\n*** Todos os jogadores conectados! ***",
-          'green', attrs=['bold']))
-
+    # print(colored("\n*** Todos os jogadores conectados! ***",
+    #       'green', attrs=['bold']))
+    print("\n*** Todos os jogadores conectados! ***")
 
 def imprime_jogador(NUMERO_JOGADOR):
     """
     Indica que um jogador se conectou
     """
-    print(f'*** Você é o jogador: ', end="")
-    print(colored(f'{NUMERO_JOGADOR}', 'cyan', attrs=['bold']), end="")
-    print(' ***')
+    # print(f'*** Você é o jogador: ', end="")
+    # print(colored(f'{NUMERO_JOGADOR}', 'cyan', attrs=['bold']), end="")
+    # print(' ***')
+    print(f'*** Você é o jogador: {NUMERO_JOGADOR} ***')
 
 
 def le_coordenada(dim) -> any:
