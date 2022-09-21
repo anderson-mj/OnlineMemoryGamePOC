@@ -7,6 +7,7 @@ Este código implementará a instância do cliente da aplicação
 import socket
 from utils import *
 import time
+import ast
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(ADDR)
@@ -26,10 +27,18 @@ while KEEP_ALIVE:
             imprime_aguardando(False)
             time.sleep(3)
     else:
-        limpa_tela()
-        mensagem = input('Digite uma mensagem: ')
         try:
-            envia_mensagem(mensagem, server)
+            msg, KEEP_ALIVE = recebe_mensagem(server)
+            limpa_tela()
+            infos = ast.literal_eval(msg)
+            print(infos['msg'])
+            if "\nPecas nao casam!\n" in infos['msg'] or "\nPecas casam!" in infos['msg']:
+                time.sleep(3)
+                continue
+            if int(infos['vez'] + 1) == int(NUMERO_JOGADOR):
+                jogada = input("Especifique uma peça para virar: ")
+                envia_mensagem(jogada, server)
+                continue
         except:
             server.close()
             print('Conexão encerrada')
