@@ -22,6 +22,7 @@ Constantes e funções utilizadas ao longo do projeto
 """
 
 
+import select
 import socket
 import os
 import time
@@ -43,7 +44,6 @@ ADDR = (SERVER, PORT)
 Funções de 'Server'
 """
 
-
 def envia_mensagem(msg, conn):
     """
     Envia mensagens para a conexão passada
@@ -51,10 +51,9 @@ def envia_mensagem(msg, conn):
     mensagem = msg.encode(FORMAT)
     envio_tam = str(len(mensagem)).encode(FORMAT)
     envio_tam += b' ' * (HEADER - len(envio_tam))
-    print(f'envio_tam: {envio_tam}')
+    print(f'tam_mensagem enviada: {envio_tam}')
     conn.send(envio_tam)
-    time.sleep(1)
-    print(f'mensagem: {mensagem}')
+    print(f'mensagem enviada: {mensagem}')
     conn.send(mensagem)
 
 
@@ -65,10 +64,14 @@ def recebe_mensagem(conn) -> tuple[str, bool]:
 
     KEEP_ALIVE = True
     tam_mensagem = conn.recv(HEADER).decode(FORMAT)
+    tam_mensagem_temp = tam_mensagem
+    print(f'tam_mensagem recebida: {tam_mensagem}, tipo: {type(tam_mensagem)}')
     if tam_mensagem:
         tam_mensagem = int(tam_mensagem)
         mensagem = conn.recv(tam_mensagem).decode(FORMAT)
+        print(f'mensagem recebida: {mensagem}')
 
+    tam_mensagem = tam_mensagem_temp
     return mensagem, KEEP_ALIVE
 
 

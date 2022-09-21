@@ -90,19 +90,15 @@ while KEEP_ALIVE:
                     remove_peca(infos['tabuleiro'], i_1, j_1)
                     remove_peca(infos['tabuleiro'], i_2, j_2)
 
-                    time.sleep(5)
                 else:
 
                     print("Pecas nao casam!")
-
-                    time.sleep(3)
 
                     fecha_peca(infos['tabuleiro'], i_1, j_1)
                     fecha_peca(infos['tabuleiro'], i_2, j_2)
                     infos['vez'] = (infos['vez'] + 1) % N_JOGADORES
                 
                 envia_mensagem(str(infos), server)
-
                 break
         else:
             print("*** Espere a sua vez ***")
