@@ -21,18 +21,18 @@ Módulo de utilidades para o projeto
 Constantes e funções utilizadas ao longo do projeto
 """
 
-import socket
 import os
-import sys
 import random
-from termcolor import colored
 
 HEADER = 64
 FORMAT = 'utf-8'
 MENSAGEM_DESCONECTADO = '!DISCONNECT'
-SERVER = '25.0.115.12'
+SERVER = '25.0.141.120'
 PORT = 5050
 ADDR = (SERVER, PORT)
+DIM = 2
+N_JOGADORES = 2
+TOTAL_DE_PARES = DIM**2 / 2
 
 """
 Funções de 'Server'
@@ -88,72 +88,74 @@ def imprime_tabuleiro(tabuleiro_atual) -> None:
     """
     Imprime o tabuleiro no terminal
     """
-
-    limpa_tela()
-
+    string = ""
     dim = len(tabuleiro_atual)
-    sys.stdout.write("    ")
+    string+= "    "
 
     for k in range(0, dim):
-        sys.stdout.write(f" {k} ")
+        string += f" {k} "
 
-    sys.stdout.write("\n")
-    sys.stdout.write("-----")
-
-    for k in range(0, dim):
-        sys.stdout.write("---")
-
-    sys.stdout.write("\n")
+    string += "\n"
+    string += "-----"
 
     for k in range(0, dim):
-        sys.stdout.write(f"{k} | ")
+        string += "---"
+
+    string += "\n"
+
+    for k in range(0, dim):
+        string += f"{k} | "
 
         for j in range(0, dim):
             if tabuleiro_atual[k][j] == '-':
-                sys.stdout.write(" - ")
+                string += " - "
 
             elif tabuleiro_atual[k][j] >= 0:
-                sys.stdout.write(f" {tabuleiro_atual[k][j]} ")
+                string += f" {tabuleiro_atual[k][j]} "
 
             else:
-                sys.stdout.write(" ? ")
+                string += " ? "
 
-        sys.stdout.write("\n")
+        string += "\n"
+    return string
 
 
 def imprime_placar(placar_atual) -> None:
     """
     Imprime o placar atual
     """
-
+    string = ""
     n_jogadores = len(placar_atual)
 
-    print("Placar:")
-    print("---------------------")
+    string+= "Placar:\n"
+    string+= "---------------------\n"
     for jogador in range(0, n_jogadores):
-        print(f"Jogador {jogador + 1}: {placar_atual[jogador]}")
+        string += f"Jogador {jogador + 1}: {placar_atual[jogador]}\n"
+
+    return string
 
 
 def imprime_status(tabuleiro_atual, placar_atual, vez) -> None:
     """
     Imprime o status do jogo
     """
+    string = ""
+    string += imprime_tabuleiro(tabuleiro_atual)
+    string += '\n'
 
-    imprime_tabuleiro(tabuleiro_atual)
-    sys.stdout.write('\n')
+    string += imprime_placar(placar_atual)
+    string += '\n'
+    string += '\n'
 
-    imprime_placar(placar_atual)
-    sys.stdout.write('\n')
-    sys.stdout.write('\n')
-
-    print(f"Vez do Jogador {vez + 1}.\n")
+    string += f"Vez do Jogador {vez + 1}.\n"
+    return string
 
 
 def imprime_vencedor(placar, N_JOGADORES):
     """
     A partir do placar define o(s) vencedor(es) e imprime na tela
     """
-
+    string = ""
     pontuacao_maxima = max(placar)
     vencedores = []
 
@@ -162,14 +164,15 @@ def imprime_vencedor(placar, N_JOGADORES):
             vencedores.append(i)
 
     if len(vencedores) > 1:
-        sys.stdout.write("Houve empate entre os jogadores ")
+        string += "Houve empate entre os jogadores "
         for i in vencedores:
-            sys.stdout.write(str(i + 1) + ' ')
+            string += str(i + 1) + ' '
 
-        sys.stdout.write("\n")
 
     else:
-        print(f"Jogador {vencedores[0] + 1} foi o vencedor!")
+        string += f"Jogador {vencedores[0] + 1} foi o vencedor!"
+
+    return string
 
 
 def imprime_aguardando(aguardando):
@@ -178,52 +181,24 @@ def imprime_aguardando(aguardando):
     """
 
     if aguardando:
-        print(colored("\n\n*** Aguardando conexões... ***\n",
-              'red', attrs=['bold']))
+        print("\n\n*** Aguardando conexões... ***\n")
         return
 
-    print(colored("\n*** Todos os jogadores conectados! ***",
-          'green', attrs=['bold']))
+    print("\n*** Todos os jogadores conectados! ***")
 
 def imprime_jogador(NUMERO_JOGADOR):
     """
     Indica que um jogador se conectou
     """
-    print(f'*** Você é o jogador: ', end="")
-    print(colored(f'{NUMERO_JOGADOR}', 'cyan', attrs=['bold']), end="")
-    print(' ***')
+    print(f'*** Você é o jogador: {NUMERO_JOGADOR} ***')
 
-def le_coordenada(dim) -> any:
+def le_coordenada(dim, input_coordenada) -> any:
     """
     Le a coordenada que o jogador irá digitar
     """
 
-    input_coordenada = input("Especifique uma peca: ")
-
-    try:
-        pos_i = int(input_coordenada.split(' ')[0])
-        pos_j = int(input_coordenada.split(' ')[1])
-    except ValueError:
-        print(
-            "Coordenadas invalidas! Use o formato \"i j\" (sem aspas),")
-        print(
-            f"onde i e j sao inteiros maiores ou iguais a 0 e menores que {dim}")
-        input("Pressione <enter> para continuar...")
-        return False
-
-    if pos_i < 0 or pos_i >= dim:
-
-        print(
-            f"Coordenada i deve ser maior ou igual a zero e menor que {dim}")
-        input("Pressione <enter> para continuar...")
-        return False
-
-    if pos_j < 0 or pos_j >= dim:
-
-        print(
-            f"Coordenada j deve ser maior ou igual a zero e menor que {dim}")
-        input("Pressione <enter> para continuar...")
-        return False
+    pos_i = int(input_coordenada.split(' ')[0])
+    pos_j = int(input_coordenada.split(' ')[1])
 
     return (pos_i, pos_j)
 

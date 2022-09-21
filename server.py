@@ -7,7 +7,6 @@ Este código implementará a instância do servidor da aplicação
 import socket
 import threading
 from utils import *
-import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
@@ -16,9 +15,7 @@ server.bind(ADDR)
 Configurações do jogo
 """
 
-DIM = 4
-N_JOGADORES = 2
-TOTAL_DE_PARES = DIM**2 / 2
+KEEP_ALIVE = True
 PARES_ENCONTRADOS = 0
 CONEXOES_ATIVAS = []
 TABULEIRO = novo_tabuleiro(DIM)
@@ -31,20 +28,20 @@ def gerencia_cliente(conn, addr):
     """
     KEEP_ALIVE = True
     while KEEP_ALIVE:
-        mensagem, KEEP_ALIVE = recebe_mensagem(conn)
-        print(mensagem)
+        continue
 
     print(f'[DESCONEXÃO] {addr} desconectado...')
     conn.close()
 
 
-def inciar() -> None:
+def iniciar() -> None:
     """
     Inicia o servidor
     """
     server.listen()
     print(f'[AGUARDANDO CONEXÕES] Servidor esperando conexões em: {SERVER}\n')
-
+    VEZ = 0
+    PARES_ENCONTRADOS = 0
     while True:
         if threading.active_count() - 1 < N_JOGADORES:
             conn, addr = server.accept()
@@ -60,7 +57,103 @@ def inciar() -> None:
             print(f'[LIMITE ATINGIDO] Limite de jogadores atingido...')
             break
 
+    while PARES_ENCONTRADOS < TOTAL_DE_PARES:
+        for conn in CONEXOES_ATIVAS:
+                string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                infos = {
+                    'msg': string,
+                    'vez': VEZ
+                }
+                envia_mensagem(str(infos), conn)
+        while True:
+            jogada, KEEP_ALIVE = recebe_mensagem(CONEXOES_ATIVAS[VEZ])
+            coordenadas = le_coordenada(DIM, jogada)
+
+            i_1, j_1 = coordenadas
+
+            if abre_peca(TABULEIRO, i_1, j_1) is False:
+                for conn in CONEXOES_ATIVAS:
+                    string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                    string+= "\nEscolha uma peca ainda fechada!"
+                    infos = {
+                        'msg': string,
+                        'vez': VEZ
+                    }
+                    envia_mensagem(str(infos), conn)
+
+                continue
+            for conn in CONEXOES_ATIVAS:
+                string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                infos = {
+                    'msg': string,
+                    'vez': VEZ
+                }
+                envia_mensagem(str(infos), conn)
+            break
+        while True:
+            jogada, KEEP_ALIVE = recebe_mensagem(CONEXOES_ATIVAS[VEZ])
+            coordenadas = le_coordenada(DIM, jogada)
+
+            i_2, j_2 = coordenadas
+            
+            if abre_peca(TABULEIRO, i_2, j_2) is False:
+                print("Escolha uma peca ainda fechada!")
+                for conn in CONEXOES_ATIVAS:
+                    string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                    string+= "\nEscolha uma peca ainda fechada!"
+                    infos = {
+                        'msg': string,
+                        'vez': VEZ
+                    }
+                    envia_mensagem(str(infos), conn)
+                continue
+            break
+        
+        if TABULEIRO[i_1][j_1] == TABULEIRO[i_2][j_2]:
+
+            incrementa_placar(PLACAR, VEZ)
+
+            for conn in CONEXOES_ATIVAS:
+                string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                string += f"\nPecas casam! Ponto para o jogador {VEZ + 1}.\n"
+                infos = {
+                    'msg': string,
+                    'vez': VEZ
+                }
+                envia_mensagem(str(infos), conn)
+            PARES_ENCONTRADOS = PARES_ENCONTRADOS + 1
+            remove_peca(TABULEIRO, i_1, j_1)
+            remove_peca(TABULEIRO, i_2, j_2)
+
+        else:
+            for conn in CONEXOES_ATIVAS:
+                string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                string += "\nPecas nao casam!\n"
+                infos = {
+                    'msg': string,
+                    'vez': VEZ
+                }
+                envia_mensagem(str(infos), conn)
+            fecha_peca(TABULEIRO, i_1, j_1)
+            fecha_peca(TABULEIRO, i_2, j_2)
+            VEZ = (VEZ + 1) % N_JOGADORES
+    
+    for conn in CONEXOES_ATIVAS:
+        string = imprime_status(TABULEIRO, PLACAR, VEZ)
+        remove = -len(f"Vez do Jogador {VEZ + 1}.\n")
+        string = string[:remove]
+        string += imprime_vencedor(PLACAR, N_JOGADORES)
+        infos = {
+            'msg': string,
+            'vez': -1
+        }
+        envia_mensagem(str(infos), conn)
+
+            
+
+            
+
 
 limpa_tela()
 print('[LIGADO] Servidor iniciando...\n')
-inciar()
+iniciar()
