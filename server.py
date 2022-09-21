@@ -97,7 +97,6 @@ def iniciar() -> None:
             i_2, j_2 = coordenadas
             
             if abre_peca(TABULEIRO, i_2, j_2) is False:
-                print("Escolha uma peca ainda fechada!")
                 for conn in CONEXOES_ATIVAS:
                     string = imprime_status(TABULEIRO, PLACAR, VEZ)
                     string+= "\nEscolha uma peca ainda fechada!"

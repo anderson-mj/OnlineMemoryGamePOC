@@ -31,6 +31,11 @@ while KEEP_ALIVE:
             msg, KEEP_ALIVE = recebe_mensagem(server)
             limpa_tela()
             infos = ast.literal_eval(msg)
+            if "\nEscolha uma peca ainda fechada!" in infos['msg'] and int(infos['vez'] + 1) != int(NUMERO_JOGADOR):
+                recorte = -len("\nEscolha uma peca ainda fechada!")
+                msg = infos['msg'][:recorte]
+                print(msg)
+                continue
             print(infos['msg'])
             if "\nPecas nao casam!\n" in infos['msg'] or "\nPecas casam!" in infos['msg'] :
                 time.sleep(3)
