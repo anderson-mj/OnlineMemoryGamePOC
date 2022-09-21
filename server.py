@@ -6,9 +6,7 @@ Este código implementará a instância do servidor da aplicação
 
 import socket
 import threading
-import time
 from utils import *
-import json
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
@@ -17,9 +15,7 @@ server.bind(ADDR)
 Configurações do jogo
 """
 
-DIM = 4
-N_JOGADORES = 2
-TOTAL_DE_PARES = DIM**2 / 2
+KEEP_ALIVE = True
 PARES_ENCONTRADOS = 0
 CONEXOES_ATIVAS = []
 TABULEIRO = novo_tabuleiro(DIM)
@@ -38,7 +34,7 @@ def gerencia_cliente(conn, addr):
     conn.close()
 
 
-def inciar() -> None:
+def iniciar() -> None:
     """
     Inicia o servidor
     """
@@ -63,30 +59,55 @@ def inciar() -> None:
 
     while PARES_ENCONTRADOS < TOTAL_DE_PARES:
         for conn in CONEXOES_ATIVAS:
-            string = imprime_status(TABULEIRO, PLACAR, VEZ)
-            infos = {
-                'msg': string,
-                'vez': VEZ
-            }
-            envia_mensagem(str(infos), conn)
-        jogada, KEEP_ALIVE = recebe_mensagem(CONEXOES_ATIVAS[VEZ])
-        coordenadas = le_coordenada(DIM, jogada)
+                string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                infos = {
+                    'msg': string,
+                    'vez': VEZ
+                }
+                envia_mensagem(str(infos), conn)
+        while True:
+            jogada, KEEP_ALIVE = recebe_mensagem(CONEXOES_ATIVAS[VEZ])
+            coordenadas = le_coordenada(DIM, jogada)
 
-        i_1, j_1 = coordenadas
+            i_1, j_1 = coordenadas
 
-        abre_peca(TABULEIRO, i_1, j_1)
-        for conn in CONEXOES_ATIVAS:
-            string = imprime_status(TABULEIRO, PLACAR, VEZ)
-            infos = {
-                'msg': string,
-                'vez': VEZ
-            }
-            envia_mensagem(str(infos), conn)
-        jogada, KEEP_ALIVE = recebe_mensagem(CONEXOES_ATIVAS[VEZ])
-        coordenadas = le_coordenada(DIM, jogada)
+            if abre_peca(TABULEIRO, i_1, j_1) is False:
+                for conn in CONEXOES_ATIVAS:
+                    string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                    string+= "\nEscolha uma peca ainda fechada!"
+                    infos = {
+                        'msg': string,
+                        'vez': VEZ
+                    }
+                    envia_mensagem(str(infos), conn)
 
-        i_2, j_2 = coordenadas
-        abre_peca(TABULEIRO, i_2, j_2)
+                continue
+            for conn in CONEXOES_ATIVAS:
+                string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                infos = {
+                    'msg': string,
+                    'vez': VEZ
+                }
+                envia_mensagem(str(infos), conn)
+            break
+        while True:
+            jogada, KEEP_ALIVE = recebe_mensagem(CONEXOES_ATIVAS[VEZ])
+            coordenadas = le_coordenada(DIM, jogada)
+
+            i_2, j_2 = coordenadas
+            
+            if abre_peca(TABULEIRO, i_2, j_2) is False:
+                print("Escolha uma peca ainda fechada!")
+                for conn in CONEXOES_ATIVAS:
+                    string = imprime_status(TABULEIRO, PLACAR, VEZ)
+                    string+= "\nEscolha uma peca ainda fechada!"
+                    infos = {
+                        'msg': string,
+                        'vez': VEZ
+                    }
+                    envia_mensagem(str(infos), conn)
+                continue
+            break
         
         if TABULEIRO[i_1][j_1] == TABULEIRO[i_2][j_2]:
 
@@ -116,6 +137,18 @@ def inciar() -> None:
             fecha_peca(TABULEIRO, i_1, j_1)
             fecha_peca(TABULEIRO, i_2, j_2)
             VEZ = (VEZ + 1) % N_JOGADORES
+    
+    for conn in CONEXOES_ATIVAS:
+        string = imprime_status(TABULEIRO, PLACAR, VEZ)
+        remove = -len(f"Vez do Jogador {VEZ + 1}.\n")
+        string = string[:remove]
+        string += imprime_vencedor(PLACAR, N_JOGADORES)
+        infos = {
+            'msg': string,
+            'vez': -1
+        }
+        envia_mensagem(str(infos), conn)
+
             
 
             
@@ -123,4 +156,4 @@ def inciar() -> None:
 
 limpa_tela()
 print('[LIGADO] Servidor iniciando...\n')
-inciar()
+iniciar()

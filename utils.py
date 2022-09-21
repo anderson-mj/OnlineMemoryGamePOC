@@ -21,17 +21,18 @@ Módulo de utilidades para o projeto
 Constantes e funções utilizadas ao longo do projeto
 """
 
-import socket
 import os
-import sys
 import random
-import time
+
 HEADER = 64
 FORMAT = 'utf-8'
 MENSAGEM_DESCONECTADO = '!DISCONNECT'
 SERVER = '25.0.141.120'
 PORT = 5050
 ADDR = (SERVER, PORT)
+DIM = 2
+N_JOGADORES = 2
+TOTAL_DE_PARES = DIM**2 / 2
 
 """
 Funções de 'Server'
@@ -154,7 +155,7 @@ def imprime_vencedor(placar, N_JOGADORES):
     """
     A partir do placar define o(s) vencedor(es) e imprime na tela
     """
-
+    string = ""
     pontuacao_maxima = max(placar)
     vencedores = []
 
@@ -163,14 +164,15 @@ def imprime_vencedor(placar, N_JOGADORES):
             vencedores.append(i)
 
     if len(vencedores) > 1:
-        sys.stdout.write("Houve empate entre os jogadores ")
+        string += "Houve empate entre os jogadores "
         for i in vencedores:
-            sys.stdout.write(str(i + 1) + ' ')
+            string += str(i + 1) + ' '
 
-        sys.stdout.write("\n")
 
     else:
-        print(f"Jogador {vencedores[0] + 1} foi o vencedor!")
+        string += f"Jogador {vencedores[0] + 1} foi o vencedor!"
+
+    return string
 
 
 def imprime_aguardando(aguardando):
@@ -188,9 +190,7 @@ def imprime_jogador(NUMERO_JOGADOR):
     """
     Indica que um jogador se conectou
     """
-    print(f'*** Você é o jogador: ')
-    print(f'{NUMERO_JOGADOR}')
-    print(' ***')
+    print(f'*** Você é o jogador: {NUMERO_JOGADOR} ***')
 
 def le_coordenada(dim, input_coordenada) -> any:
     """

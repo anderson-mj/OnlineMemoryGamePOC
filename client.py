@@ -32,11 +32,33 @@ while KEEP_ALIVE:
             limpa_tela()
             infos = ast.literal_eval(msg)
             print(infos['msg'])
-            if "\nPecas nao casam!\n" in infos['msg'] or "\nPecas casam!" in infos['msg']:
+            if "\nPecas nao casam!\n" in infos['msg'] or "\nPecas casam!" in infos['msg'] :
                 time.sleep(3)
                 continue
             if int(infos['vez'] + 1) == int(NUMERO_JOGADOR):
-                jogada = input("Especifique uma peça para virar: ")
+                while True:
+                    jogada = input("Especifique uma peça para virar: ")
+                    try:
+                        pos_i = int(jogada.split(' ')[0])
+                        pos_j = int(jogada.split(' ')[1])
+                    except ValueError:
+                        print(
+                            "Coordenadas invalidas! Use o formato \"i j\" (sem aspas),")
+                        print(
+                            f"onde i e j sao inteiros maiores ou iguais a 0 e menores que {DIM}")
+                        continue
+
+                    if pos_i < 0 or pos_i >= DIM:
+
+                        print(
+                            f"Coordenada i deve ser maior ou igual a zero e menor que {DIM}")
+                        continue
+
+                    if pos_j < 0 or pos_j >= DIM:
+                        print(
+                            f"Coordenada j deve ser maior ou igual a zero e menor que {DIM}")
+                        continue
+                    break
                 envia_mensagem(jogada, server)
                 continue
         except:
