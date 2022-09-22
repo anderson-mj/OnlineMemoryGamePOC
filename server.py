@@ -5,7 +5,6 @@ Este código implementará a instância do servidor da aplicação
 """
 
 import socket
-import threading
 from utils import *
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -18,17 +17,6 @@ TABULEIRO = novo_tabuleiro(DIM)
 PLACAR = novo_placar(N_JOGADORES)
 
 
-def gerencia_cliente(conn, addr):
-    """
-    Lida com as conexões ao servidor
-    """
-    while KEEP_ALIVE:
-        continue
-
-    print(f'[DESCONEXÃO] {addr} desconectado...')
-    conn.close()
-
-
 def iniciar() -> None:
     """
     Inicia o servidor
@@ -39,13 +27,11 @@ def iniciar() -> None:
     PARES_ENCONTRADOS = 0
     
     while True:
-        if threading.active_count() - 1 < N_JOGADORES:
+        if len(CONEXOES_ATIVAS) < N_JOGADORES:
             conn, addr = server.accept()
-            thread = threading.Thread(target=gerencia_cliente, args=(conn, addr))
-            thread.start()
             CONEXOES_ATIVAS.append(conn)
             print(f'[NOVA CONEXÃO] {addr} conectado...\n')
-            envia_mensagem(str(threading.active_count() - 1), conn)
+            envia_mensagem(str(CONEXOES_ATIVAS.index(conn) + 1), conn)
         else:
             for conn in CONEXOES_ATIVAS:
                 envia_mensagem('CAN_PLAY', conn)
@@ -151,9 +137,12 @@ def iniciar() -> None:
             conn.close()
             print(f'[DESCONEXÃO] {CONEXOES_ATIVAS.index(conn)} desconectado...\n')
 
-    print(f'[FIM] Fim do jogo, reinicie o servidor...')
-    server.close()
+    print(f'[FIM] Fim do jogo, reiniciando o servidor...\n')
 
+    time.sleep(10)
+    limpa_tela()
+    CONEXOES_ATIVAS.clear()
+    iniciar()
 
 limpa_tela()
 print('[LIGADO] Servidor iniciando...\n')

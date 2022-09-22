@@ -11,6 +11,7 @@ import ast
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect(ADDR)
+
 CAN_PLAY = False
 
 limpa_tela()
