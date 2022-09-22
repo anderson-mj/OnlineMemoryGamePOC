@@ -1,38 +1,30 @@
 """
-messageServerClient = {
-  'tabuleiro': [[]],
-  'vez': 0,
-  'placar': {'0': 0, '1': 0}
-}
+--- Utils ---
 
-messageClientServer = {
-  'peça': {'i': 0, 'j': 0},
-  'vez': 0
-}
-"""
-
-
-"""
-Módulo de utilidades para o projeto
-"""
-
-
-"""
-Constantes e funções utilizadas ao longo do projeto
+Este código implementará um módulo de utilidades para o projeto
 """
 
 import os
 import random
+import time
 
+"""
+Configurações do servidor
+"""
 HEADER = 64
 FORMAT = 'utf-8'
 MENSAGEM_DESCONECTADO = '!DISCONNECT'
-SERVER = '25.0.141.120'
+SERVER = '25.0.115.12'
 PORT = 5050
 ADDR = (SERVER, PORT)
+
+"""
+Configurações do jogo
+"""
 DIM = 2
 N_JOGADORES = 2
 TOTAL_DE_PARES = DIM**2 / 2
+
 
 """
 Funções de 'Server'
@@ -54,21 +46,12 @@ def recebe_mensagem(conn):
     """
     Recebe mensagens da conexão passada, e indica se a conexão deve continuar ativa
     """
-
-    KEEP_ALIVE = True
     tam_mensagem = conn.recv(HEADER).decode(FORMAT)
     if tam_mensagem:
         tam_mensagem = int(tam_mensagem)
         mensagem = conn.recv(tam_mensagem).decode(FORMAT)
 
-    if mensagem == MENSAGEM_DESCONECTADO:
-        KEEP_ALIVE = False
-
-    return mensagem, KEEP_ALIVE
-
-
-def send_dict(dict, conn):
-    pass
+    return mensagem
 
 
 """
@@ -82,6 +65,14 @@ def limpa_tela() -> None:
     """
 
     os.system('cls' if os.name == 'nt' else 'clear')
+
+def reimprime_tabuleiro(tabuleiro_atual):
+    """
+    Reimprime o tabuleiro no terminal com um delay
+    """
+    time.sleep(3)
+    limpa_tela()
+    print(tabuleiro_atual['msg'])
 
 
 def imprime_tabuleiro(tabuleiro_atual) -> None:
@@ -179,7 +170,6 @@ def imprime_aguardando(aguardando):
     """
     Indica que os jogadores ainda não estão conectados
     """
-
     if aguardando:
         print("\n\n*** Aguardando conexões... ***\n")
         return
@@ -196,7 +186,6 @@ def le_coordenada(dim, input_coordenada) -> any:
     """
     Le a coordenada que o jogador irá digitar
     """
-
     pos_i = int(input_coordenada.split(' ')[0])
     pos_j = int(input_coordenada.split(' ')[1])
 
@@ -212,7 +201,6 @@ def novo_tabuleiro(dim) -> list:
     """
     Cria um novo tabuleiro para a partida
     """
-
     tabuleiro_novo = []
     posicoes_disponiveis = []
 
@@ -261,7 +249,6 @@ def fecha_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Fecha a peça escolhida pelo jogador
     """
-
     if tabuleiro_atual[pos_i][pos_j] == '-':
         return False
     if tabuleiro_atual[pos_i][pos_j] > 0:
@@ -275,7 +262,6 @@ def remove_peca(tabuleiro_atual, pos_i, pos_j) -> bool:
     """
     Remove a peça escolhida pelo jogador
     """
-
     if tabuleiro_atual[pos_i][pos_j] == '-':
         return False
 
@@ -287,7 +273,6 @@ def novo_placar(n_jogadores) -> list:
     """
     Cria um novo placar
     """
-
     return [0] * n_jogadores
 
 
@@ -295,5 +280,4 @@ def incrementa_placar(placar_atual, jogador) -> None:
     """
     Incrementa o placar pra um jogador
     """
-
     placar_atual[jogador] = placar_atual[jogador] + 1
